@@ -1,9 +1,7 @@
 %{
 #include <stdlib.h>
 #include <stdio.h>
-
-unsigned int lineas = 1;
-
+#include <string.h>
 
 %}
 
