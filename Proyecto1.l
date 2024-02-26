@@ -59,7 +59,7 @@ ADDOPERATOR			\+|\-|or
 RELOPERATOR			<|>|<=|>=|<>|=|in
 
 // Simbolos
-SIMBOLO				\(|\)|\[|\]|\{|\}|\,|\.|\:|\;|\^|\:=|\.\.
+SIMBOLO				\(|\)|\[|\]|\,|\.|\:|\;|\^|\:=|\.\.
 
 // Palabras Reservadas
 PALABRARESERVADA	program|begin|uses|unit|interface|implementation|label|const|type|real|integer|longint|word|char|boolean|true|false|string|packed|array|record|end|case|otherwise|of|set|var|forward|external|function|procedure|file|goto|if|then|else|repeat|until|while|do|for|to|downto|with|nil|read|readln|write|writeln|in|or|div|mod|and|not
@@ -74,7 +74,7 @@ NOTACIONEXPONENCIAL	{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 
 // Imprimir en pantalla la fila y columna de cada uno de los tokens encontrados
 
-// Comentarios
+// Comentarios (Falta)
 
 // ALMACENAR EN UN ARCHIVO .CSV A PARTIR DE AQUI
 
@@ -82,7 +82,9 @@ NOTACIONEXPONENCIAL	{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 		printf("\nPalabra Reservada: %s\n", yytext);
 	}
 
-// Constantes de Cadenas de Caracteres
+// Identificadores (Falta)
+
+// Constantes de Cadenas de Caracteres (Falta)
 
 {SIMBOLO}	{
 		printf("\nSimbolo: %s\n", yytext);
