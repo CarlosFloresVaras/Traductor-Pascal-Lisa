@@ -1,5 +1,5 @@
-/*
 
+/*
 Desarrollar un escaner con Flex que reconozca los siguientes elementos:
 1-	Debe reconocer e imprimir en la pantalla los comentarios en ambos estilos de Pascal { } y (* *).
 2-	Reconocer las palabras reservadas, imprimirlas y almacenarlas en un archivo .csv. La primera columna es un consecutivo, la segunda es la palabra reservada y la tercera las veces que aparece.
@@ -15,7 +15,6 @@ else repeat until while do for to downto with nil read readln write writeln in o
 6-	Debe imprimir en la pantalla la fila y columna de cada uno de los tokens encontrados.
 7-	Debe imprimir en pantalla la cantidad de espacios y tabuladores encontrados así como la fila y columna.
 8-	Debe reconocer los elementos sin atender a caracteres mayúsculos o minúsculos
-
 */
 
 
@@ -32,7 +31,7 @@ unsigned int
 %option yylineno
 %option outfile="Scanner.cpp"
 
-// DEFINICION DE TOKENS
+// DEFINICION DE TOKENS DE PASCAL-LISA
 
 // Letras 
 LETRA				[a-zA-Z]
@@ -41,8 +40,14 @@ LETRA				[a-zA-Z]
 DIGITOSINCERO		[1-9]
 DIGITO 				[0-9]
 
-// Comentarios
-COMENTARIO 			\{.*\}|\(\*.*\*\)
+// Comentarios { any-text-not-contalnlng-right-brace } (* any-text-not-contatnlng star-right-paren *)
+COMENTARIO 			\{[^}]*\}|\(\*[^*]*\*\)
+
+// Identificadores
+IDENTIFICADOR		{LETRA}({LETRA}|{DIGITO}|_)*
+
+// Tabuladores y Espacios
+BLANK				 [ \t]
 
 // Cadenas de Caracteres
 
@@ -67,9 +72,9 @@ NOTACIONEXPONENCIAL	{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 
 %%
 
-{COMENT}	{
-		printf("\nComentario: %s\n", yytext);
-	}
+// Imprimir en pantalla la fila y columna de cada uno de los tokens encontrados
+
+// Comentarios
 
 // ALMACENAR EN UN ARCHIVO .CSV A PARTIR DE AQUI
 
@@ -111,17 +116,30 @@ NOTACIONEXPONENCIAL	{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 		printf("\nNotacion Exponencial: %s\n", yytext);
 	}
 
+{BLANK}	{
+		printf("\nEspacio en Blanco: %s\n", yytext);
+	}
 %%
 
 int main(int argc, char* argv[])
 {
-	if (argc > 1)
-		{
-			++argv;
-		}
-		else
-		{
-			yyin = stdin;
-		}
+	if (argc < 2)
+	{
+		printf("Falta el archivo de entrada\n");
+		return 1;
+	}
+
+	yyin = fopen(argv[1], "r");
+
+	if (yyin == NULL)
+	{
+		printf("No se pudo abrir el archivo\n");
+		return 1;
+	}
+
 	yylex();
+
+	fclose(yyin);
+
+	return 0;
 }
