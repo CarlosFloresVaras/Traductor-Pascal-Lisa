@@ -66,7 +66,6 @@ CONSTANTEENTERA		[\+\-]?{DIGITOSINCERO}{DIGITO}*
 CONSTANTEREAL		[\+\-]?{DIGITOSINCERO}{DIGITO}*\.{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 
-
 %%
 
 // Imprimir en pantalla la fila y columna de cada uno de los tokens encontrados "(fila, columna) Comentario encontrado: {comentario}"
