@@ -72,9 +72,11 @@ NOTACIONEXPONENCIAL	{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 
 %%
 
-// Imprimir en pantalla la fila y columna de cada uno de los tokens encontrados
+// Imprimir en pantalla la fila y columna de cada uno de los tokens encontrados "(fila, columna) Comentario encontrado: {comentario}"
 
-// Comentarios (Falta)
+{COMENTARIO}	{
+		printf("\nComentario: %s\n", yytext);
+	}
 
 // ALMACENAR EN UN ARCHIVO .CSV A PARTIR DE AQUI
 
@@ -83,6 +85,10 @@ NOTACIONEXPONENCIAL	{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 	}
 
 // Identificadores (Falta)
+
+{IDENTIFICADOR}	{
+		printf("\nIdentificador: %s\n", yytext);
+	}
 
 // Constantes de Cadenas de Caracteres (Falta)
 
