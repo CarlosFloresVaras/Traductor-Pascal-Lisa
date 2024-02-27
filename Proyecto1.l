@@ -21,9 +21,7 @@ else repeat until while do for to downto with nil read readln write writeln in o
 %{
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
-
-unsigned int 
+#include <string.h> 
 
 %}
 
@@ -47,10 +45,9 @@ COMENTARIO 			\{[^}]*\}|\(\*[^*]*\*\)
 IDENTIFICADOR		{LETRA}({LETRA}|{DIGITO}|_)*
 
 // Tabuladores y Espacios
-BLANK				 [ \t]
+BLANK				[ \t]
 
 // Cadenas de Caracteres
-
 
 // Operadores
 UNARYOPERATOR		@|not
@@ -65,9 +62,9 @@ SIMBOLO				\(|\)|\[|\]|\,|\.|\:|\;|\^|\:=|\.\.
 PALABRARESERVADA	program|begin|uses|unit|interface|implementation|label|const|type|real|integer|longint|word|char|boolean|true|false|string|packed|array|record|end|case|otherwise|of|set|var|forward|external|function|procedure|file|goto|if|then|else|repeat|until|while|do|for|to|downto|with|nil|read|readln|write|writeln|in|or|div|mod|and|not
 
 // Constantes
-CONSTANTEENTERA		{DIGITOSINCERO}{DIGITO}*
-CONSTANTEREAL		{DIGITOSINCERO}{DIGITO}*\.{DIGITO}+([eE][\+\-]?{DIGITO}+)?
-NOTACIONEXPONENCIAL	{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
+CONSTANTEENTERA		[\+\-]?{DIGITOSINCERO}{DIGITO}*
+CONSTANTEREAL		[\+\-]?{DIGITOSINCERO}{DIGITO}*\.{DIGITO}+([eE][\+\-]?{DIGITO}+)?
+NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 
 
 %%
