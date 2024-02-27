@@ -21,9 +21,7 @@ else repeat until while do for to downto with nil read readln write writeln in o
 %{
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
-
-unsigned int 
+#include <string.h> 
 
 %}
 
@@ -31,66 +29,56 @@ unsigned int
 %option yylineno
 %option outfile="Scanner.cpp"
 
-// DEFINICION DE TOKENS DE PASCAL-LISA
+/* DEFINICION DE TOKENS DE PASCAL-LISA */
 
-// Letras 
+/* Letras */
 LETRA				[a-zA-Z]
 
-// Digitos
+/* Digitos */
 DIGITOSINCERO		[1-9]
 DIGITO 				[0-9]
 
-// Comentarios { any-text-not-contalnlng-right-brace } (* any-text-not-contatnlng star-right-paren *)
+/* Comentarios { any-text-not-contalnlng-right-brace } (* any-text-not-contatnlng star-right-paren *) */
 COMENTARIO 			\{[^}]*\}|\(\*[^*]*\*\)
 
-// Identificadores
+/* Identificadores */
 IDENTIFICADOR		{LETRA}({LETRA}|{DIGITO}|_)*
 
-// Tabuladores y Espacios
-BLANK				 [ \t]
+/* Tabuladores y Espacios en Blanco */
+BLANK				[ \t]
 
-// Cadenas de Caracteres
+/* Cadenas de Caracteres */
 
-
-// Operadores
+/* Operadores */
 UNARYOPERATOR		@|not
 MULTOPERATOR		\*|\/|div|mod|and
 ADDOPERATOR			\+|\-|or
 RELOPERATOR			<|>|<=|>=|<>|=|in
 
-// Simbolos
+/* Simbolos */
 SIMBOLO				\(|\)|\[|\]|\,|\.|\:|\;|\^|\:=|\.\.
 
-// Palabras Reservadas
+/* Palabras Reservadas */
 PALABRARESERVADA	program|begin|uses|unit|interface|implementation|label|const|type|real|integer|longint|word|char|boolean|true|false|string|packed|array|record|end|case|otherwise|of|set|var|forward|external|function|procedure|file|goto|if|then|else|repeat|until|while|do|for|to|downto|with|nil|read|readln|write|writeln|in|or|div|mod|and|not
 
-// Constantes
-CONSTANTEENTERA		{DIGITOSINCERO}{DIGITO}*
-CONSTANTEREAL		{DIGITOSINCERO}{DIGITO}*\.{DIGITO}+([eE][\+\-]?{DIGITO}+)?
-NOTACIONEXPONENCIAL	{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
-
+/* Constantes */
+CONSTANTEENTERA		[\+\-]?{DIGITOSINCERO}{DIGITO}*
+CONSTANTEREAL		[\+\-]?{DIGITOSINCERO}{DIGITO}*\.{DIGITO}+([eE][\+\-]?{DIGITO}+)?
+NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 
 %%
-
-// Imprimir en pantalla la fila y columna de cada uno de los tokens encontrados "(fila, columna) Comentario encontrado: {comentario}"
 
 {COMENTARIO}	{
 		printf("\nComentario: %s\n", yytext);
 	}
 
-// ALMACENAR EN UN ARCHIVO .CSV A PARTIR DE AQUI
-
 {PALABRARESERVADA}	{
 		printf("\nPalabra Reservada: %s\n", yytext);
 	}
 
-// Identificadores (Falta)
-
 {IDENTIFICADOR}	{
 		printf("\nIdentificador: %s\n", yytext);
 	}
-
-// Constantes de Cadenas de Caracteres (Falta)
 
 {SIMBOLO}	{
 		printf("\nSimbolo: %s\n", yytext);
