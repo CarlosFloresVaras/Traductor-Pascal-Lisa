@@ -38,7 +38,7 @@ LETRA				[a-zA-Z]
 DIGITOSINCERO		[1-9]
 DIGITO 				[0-9]
 
-/* Comentarios { any-text-not-contalnlng-right-brace } (* any-text-not-contatnlng star-right-paren *) */
+/* Comentarios */
 COMENTARIO 			\{[^}]*\}|\(\*[^*]*\*\)
 
 /* Identificadores */
@@ -59,7 +59,7 @@ RELOPERATOR			<|>|<=|>=|<>|=|in
 SIMBOLO				\(|\)|\[|\]|\,|\.|\:|\;|\^|\:=|\.\.
 
 /* Palabras Reservadas */
-PALABRARESERVADA	program|begin|uses|unit|interface|implementation|label|const|type|real|integer|longint|word|char|boolean|true|false|string|packed|array|record|end|case|otherwise|of|set|var|forward|external|function|procedure|file|goto|if|then|else|repeat|until|while|do|for|to|downto|with|nil|read|readln|write|writeln|in|or|div|mod|and|not
+PALABRARESERVADA	program|begin|uses|unit|interface|implementation|label|const|type|real|integer|longint|word|char|boolean|true|false|string|packed|array|record|end|case|otherwise|of|set|var|forward|external|function|procedure|file|goto|if|then|else|repeat|until|while|do|for|to|downto|with|nil|read|readln|write|writeln
 
 /* Constantes */
 CONSTANTEENTERA		[\+\-]?{DIGITOSINCERO}{DIGITO}*
