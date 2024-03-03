@@ -48,6 +48,7 @@ IDENTIFICADOR		{LETRA}({LETRA}|{DIGITO}|_)*
 BLANK				[ \t]
 
 /* Cadenas de Caracteres */
+CADENA				\"[^"]*\"
 
 /* Operadores */
 UNARYOPERATOR		@|not
@@ -72,12 +73,12 @@ NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 		printf("\nComentario: %s\n", yytext);
 	}
 
-{PALABRARESERVADA}	{
-		printf("\nPalabra Reservada: %s\n", yytext);
+{BLANK}	{
+		printf("\nEspacio en Blanco: %s\n", yytext);
 	}
 
-{IDENTIFICADOR}	{
-		printf("\nIdentificador: %s\n", yytext);
+{PALABRARESERVADA}	{
+		printf("\nPalabra Reservada: %s\n", yytext);
 	}
 
 {SIMBOLO}	{
@@ -100,6 +101,10 @@ NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 		printf("\nOperador Relacional: %s\n", yytext);
 	}
 
+{IDENTIFICADOR}	{
+		printf("\nIdentificador: %s\n", yytext);
+	}
+
 {CONSTANTEREAL}	{
 		printf("\nConstante Real: %s\n", yytext);
 	}
@@ -112,9 +117,6 @@ NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 		printf("\nNotacion Exponencial: %s\n", yytext);
 	}
 
-{BLANK}	{
-		printf("\nEspacio en Blanco: %s\n", yytext);
-	}
 %%
 
 int main(int argc, char* argv[])
