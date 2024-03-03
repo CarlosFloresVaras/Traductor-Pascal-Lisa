@@ -23,6 +23,8 @@ else repeat until while do for to downto with nil read readln write writeln in o
 #include <stdio.h>
 #include <string.h> 
 
+/* Funciones */
+
 %}
 
 %option noyywrap
@@ -117,6 +119,9 @@ NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 		printf("\nNotacion Exponencial: %s\n", yytext);
 	}
 
+{CADENA}	{
+		printf("\nCadena de Caracteres: %s\n", yytext);
+	}
 %%
 
 int main(int argc, char* argv[])
