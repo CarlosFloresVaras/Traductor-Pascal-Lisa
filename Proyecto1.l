@@ -25,7 +25,7 @@ else repeat until while do for to downto with nil read readln write writeln in o
 
 /* Variables */
 unsigned int contadorfila = 0;
-
+unsigned int contadorcolumna = 0;
 
 unsigned int contadorBLANK = 0;
 unsigned int contadorNEWLINE = 0;
@@ -51,7 +51,7 @@ DIGITO 				[0-9]
 COMENTARIO 			\{[^}]*\}|\(\*[^*]*\*\)
 
 /* Identificadores */
-IDENTIFICADOR		{LETRA}({LETRA}|{DIGITO}|_)*
+IDENTIFICADOR		{LETRA}({LETRA}|{DIGITO}|_)+
 
 /* Tabuladores y Espacios en Blanco */
 BLANK				[ \t]
@@ -84,17 +84,29 @@ NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 {NEWLINE}	{
 		contadorfila++;
 		contadorNEWLINE += yyleng;
-		printf("\n%dambio de linea.\n", yytext);
+		printf("\n%d Cambio de linea.\n", contadorNEWLINE);
 		contadorNEWLINE = 0;
 	}	
 
 {COMENTARIO}	{
-		printf("\nComentario: %s\n", yytext);
+    char* comentario = yytext;  // Obtén el texto del comentario
+	if (comentario[0] == '(' )
+	{
+		comentario++;
+		comentario++;
+    	comentario[strlen(comentario) - 2] = '\0';  // Elimina el último carácter de cierre '}' o '*'
 	}
+    else
+	{
+		comentario++;  // Avanza para ignorar el primer carácter de apertura '{' o '('
+    	comentario[strlen(comentario) - 1] = '\0';  // Elimina el último carácter de cierre '}' o '*'
+	}
+    printf("\nComentario: %s\n", comentario);
+}
 
 {BLANK}	{
 		contadorBLANK += yyleng;
-		printf("\n%dEspacio en blanco y/o tabuladores\n", contadorBLANK);
+		printf("\nEspacio en blanco y/o tabulador: %d\n", contadorBLANK);
 		contadorBLANK = 0;
 	}
 
@@ -139,7 +151,10 @@ NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 	}
 
 {CADENA}	{
-		printf("\nCadena de Caracteres: %s\n", yytext);
+	  char* cadena = yytext;  // Obtén el texto de la cadena
+    cadena++;  // Avanza para ignorar el primer carácter de apertura '
+    cadena[strlen(cadena) - 1] = '\0';  // Elimina el último carácter de cierre '
+    printf("\nCadena de Caracteres: %s\n", cadena);
 	}
 %%
 
