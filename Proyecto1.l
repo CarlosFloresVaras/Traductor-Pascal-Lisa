@@ -89,8 +89,20 @@ NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 	}	
 
 {COMENTARIO}	{
-		printf("\nComentario: %s\n", yytext);
+    char* comentario = yytext;  // Obtén el texto del comentario
+	if (comentario[0] == '(' )
+	{
+		comentario++;
+		comentario++;
+    	comentario[strlen(comentario) - 2] = '\0';  // Elimina el último carácter de cierre '}' o '*'
 	}
+    else
+	{
+		comentario++;  // Avanza para ignorar el primer carácter de apertura '{' o '('
+    	comentario[strlen(comentario) - 1] = '\0';  // Elimina el último carácter de cierre '}' o '*'
+	}
+    printf("\nComentario: %s\n", comentario);
+}
 
 {BLANK}	{
 		contadorBLANK += yyleng;
@@ -139,7 +151,10 @@ NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 	}
 
 {CADENA}	{
-		printf("\nCadena de Caracteres: %s\n", yytext);
+	  char* cadena = yytext;  // Obtén el texto de la cadena
+    cadena++;  // Avanza para ignorar el primer carácter de apertura '
+    cadena[strlen(cadena) - 1] = '\0';  // Elimina el último carácter de cierre '
+    printf("\nCadena de Caracteres: %s\n", cadena);
 	}
 %%
 
