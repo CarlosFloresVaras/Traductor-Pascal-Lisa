@@ -25,6 +25,7 @@ else repeat until while do for to downto with nil read readln write writeln in o
 
 /* Variables */
 unsigned int contadorBLANK = 0;
+unsigned int contadorNEWLINE = 0;
 
 /* Funciones */
 
@@ -78,7 +79,9 @@ NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 %%
 
 {NEWLINE}	{
-		printf("\nCambio de linea. %s\n", yytext);
+		contadorNEWLINE += yyleng;
+		printf("\n%dambio de linea.\n", yytext);
+		contadorNEWLINE = 0;
 	}	
 
 {COMENTARIO}	{
@@ -87,7 +90,7 @@ NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 
 {BLANK}	{
 		contadorBLANK += yyleng;
-		printf("\nEspacio en Blanco: %d\n", contadorBLANK);
+		printf("\n%dEspacio en blanco y/o tabuladores\n", contadorBLANK);
 		contadorBLANK = 0;
 	}
 
