@@ -23,6 +23,9 @@ else repeat until while do for to downto with nil read readln write writeln in o
 #include <stdio.h>
 #include <string.h> 
 
+/* Variables */
+unsigned int contadorBLANK = 0;
+
 /* Funciones */
 
 %}
@@ -49,6 +52,9 @@ IDENTIFICADOR		{LETRA}({LETRA}|{DIGITO}|_)*
 /* Tabuladores y Espacios en Blanco */
 BLANK				[ \t]
 
+/* Nueva Linea */
+NEWLINE				\n
+
 /* Cadenas de Caracteres */
 CADENA				\"[^"]*\"
 
@@ -71,12 +77,18 @@ NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 
 %%
 
+{NEWLINE}	{
+		printf("\nCambio de linea. %s\n", yytext);
+	
+
 {COMENTARIO}	{
 		printf("\nComentario: %s\n", yytext);
 	}
 
 {BLANK}	{
-		printf("\nEspacio en Blanco: %s\n", yytext);
+		contadorBLANK += yyleng;
+		printf("\nEspacio en Blanco: %d\n", contadorBLANK);
+		contadorBLANK = 0;
 	}
 
 {PALABRARESERVADA}	{
