@@ -24,6 +24,9 @@ else repeat until while do for to downto with nil read readln write writeln in o
 #include <string.h> 
 
 /* Variables */
+unsigned int contadorfila = 0;
+
+
 unsigned int contadorBLANK = 0;
 unsigned int contadorNEWLINE = 0;
 
@@ -57,7 +60,7 @@ BLANK				[ \t]
 NEWLINE				\n
 
 /* Cadenas de Caracteres */
-CADENA				\"[^"]*\"
+CADENA				\'[^']*\'
 
 /* Operadores */
 UNARYOPERATOR		@|not
@@ -71,7 +74,7 @@ SIMBOLO				\(|\)|\[|\]|\,|\.|\:|\;|\^|\:=|\.\.
 /* Palabras Reservadas */
 PALABRARESERVADA	program|begin|uses|unit|interface|implementation|label|const|type|real|integer|longint|word|char|boolean|true|false|string|packed|array|record|end|case|otherwise|of|set|var|forward|external|function|procedure|file|goto|if|then|else|repeat|until|while|do|for|to|downto|with|nil|read|readln|write|writeln
 
-/* Constantes */
+/* Constantes */ 
 CONSTANTEENTERA		[\+\-]?{DIGITOSINCERO}{DIGITO}*
 CONSTANTEREAL		[\+\-]?{DIGITOSINCERO}{DIGITO}*\.{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
@@ -79,6 +82,7 @@ NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 %%
 
 {NEWLINE}	{
+		contadorfila++;
 		contadorNEWLINE += yyleng;
 		printf("\n%dambio de linea.\n", yytext);
 		contadorNEWLINE = 0;
