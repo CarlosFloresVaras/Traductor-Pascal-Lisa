@@ -106,62 +106,74 @@ NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
     		comentario[strlen(comentario) - 1] = '\0';  // Elimina el último carácter de cierre '}' o '*'
 	}
     printf("\n(%d,%d) Comentario: %s\n", contadorF, contadorC, comentario);
+	contadorC += yyleng;
 }
 
 {BLANK}	{
 		contadorC++;
 		printf("\n(%d,%d) Espacio en blanco y/o tabulador: %d\n", contadorF, contadorC, contadorBLANK);
 		contadorBLANK = 0;
+		contadorC += yyleng;
 	}
 
 {PALABRARESERVADA}	{
 		contadorC++;
 		printf("\n(%d,%d) Palabra Reservada: %s\n", contadorF, contadorC, yytext);
+		contadorC += yyleng;
 	}
 
 {SIMBOLO}	{
 		contadorC++;
 		printf("\n(%d,%d) Simbolo: %s\n", contadorF, contadorC, yytext);
+		contadorC += yyleng;
 	}
 
 {UNARYOPERATOR}	{
 		contadorC++;
 		printf("\n(%d,%d) Operador Unario: %s\n", contadorF, contadorC, yytext);
+		contadorC += yyleng;
 	}
 
 {MULTOPERATOR}	{
 		contadorC++;
 		printf("\n(%d,%d) Operador Multiplicativo: %s\n", contadorF, contadorC, yytext);
+		contadorC += yyleng;
 	}
 
 {ADDOPERATOR}	{
 		contadorC++;
 		printf("\n(%d,%d) Operador Aditivo: %s\n", contadorF, contadorC, yytext);
+		contadorC += yyleng;
 	}
 
 {RELOPERATOR}	{
 		contadorC++;
 		printf("\n(%d,%d) Operador Relacional: %s\n", contadorF, contadorC, yytext);
+		contadorC += yyleng;
 	}
 
 {IDENTIFICADOR}	{
 		contadorC++;
 		printf("\n(%d,%d) Identificador: %s\n", contadorF, contadorC, yytext);
+		contadorC += yyleng;
 	}
 
 {CONSTANTEREAL}	{
 		contadorC++;
 		printf("\n(%d,%d) Constante Real: %s\n", contadorF, contadorC, yytext);
+		contadorC += yyleng;
 	}
 
 {CONSTANTEENTERA}	{
 		contadorC++;
 		printf("\n(%d,%d) Constante Entera: %s\n", contadorF, contadorC, yytext);
+		contadorC += yyleng;
 	}
 
 {NOTACIONEXPONENCIAL}	{
 		contadorC++;
 		printf("\n(%d,%d) Notacion Exponencial: %s\n", contadorF, contadorC, yytext);
+		contadorC += yyleng;
 	}
 
 {CADENA}	{
@@ -170,6 +182,7 @@ NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
     	cadena++;  // Avanza para ignorar el primer carácter de apertura '
     	cadena[strlen(cadena) - 1] = '\0';  // Elimina el último carácter de cierre '
     	printf("\n(%d,%d) Cadena de Caracteres: %s\n", contadorF, contadorC, cadena);
+		contadorC += yyleng;
 	}
 %%
 
