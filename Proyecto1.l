@@ -23,6 +23,13 @@ else repeat until while do for to downto with nil read readln write writeln in o
 #include <stdio.h>
 #include <string.h> 
 
+/* Variables */
+unsigned int contadorfila = 0;
+unsigned int contadorcolumna = 0;
+
+unsigned int contadorBLANK = 0;
+unsigned int contadorNEWLINE = 0;
+
 /* Funciones */
 
 %}
@@ -44,13 +51,16 @@ DIGITO 				[0-9]
 COMENTARIO 			\{[^}]*\}|\(\*[^*]*\*\)
 
 /* Identificadores */
-IDENTIFICADOR		{LETRA}({LETRA}|{DIGITO}|_)*
+IDENTIFICADOR		{LETRA}({LETRA}|{DIGITO}|_)+
 
 /* Tabuladores y Espacios en Blanco */
 BLANK				[ \t]
 
+/* Nueva Linea */
+NEWLINE				\n
+
 /* Cadenas de Caracteres */
-CADENA				\"[^"]*\"
+CADENA				\'[^']*\'
 
 /* Operadores */
 UNARYOPERATOR		@|not
@@ -64,19 +74,40 @@ SIMBOLO				\(|\)|\[|\]|\,|\.|\:|\;|\^|\:=|\.\.
 /* Palabras Reservadas */
 PALABRARESERVADA	program|begin|uses|unit|interface|implementation|label|const|type|real|integer|longint|word|char|boolean|true|false|string|packed|array|record|end|case|otherwise|of|set|var|forward|external|function|procedure|file|goto|if|then|else|repeat|until|while|do|for|to|downto|with|nil|read|readln|write|writeln
 
-/* Constantes */
+/* Constantes */ 
 CONSTANTEENTERA		[\+\-]?{DIGITOSINCERO}{DIGITO}*
 CONSTANTEREAL		[\+\-]?{DIGITOSINCERO}{DIGITO}*\.{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 
 %%
 
+{NEWLINE}	{
+		contadorfila++;
+		contadorNEWLINE += yyleng;
+		printf("\n%d Cambio de linea.\n", contadorNEWLINE);
+		contadorNEWLINE = 0;
+	}	
+
 {COMENTARIO}	{
-		printf("\nComentario: %s\n", yytext);
+    char* comentario = yytext;  // Obtén el texto del comentario
+	if (comentario[0] == '(' )
+	{
+		comentario++;
+		comentario++;
+    	comentario[strlen(comentario) - 2] = '\0';  // Elimina el último carácter de cierre '}' o '*'
 	}
+    else
+	{
+		comentario++;  // Avanza para ignorar el primer carácter de apertura '{' o '('
+    	comentario[strlen(comentario) - 1] = '\0';  // Elimina el último carácter de cierre '}' o '*'
+	}
+    printf("\nComentario: %s\n", comentario);
+}
 
 {BLANK}	{
-		printf("\nEspacio en Blanco: %s\n", yytext);
+		contadorBLANK += yyleng;
+		printf("\nEspacio en blanco y/o tabulador: %d\n", contadorBLANK);
+		contadorBLANK = 0;
 	}
 
 {PALABRARESERVADA}	{
@@ -120,7 +151,10 @@ NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 	}
 
 {CADENA}	{
-		printf("\nCadena de Caracteres: %s\n", yytext);
+	  char* cadena = yytext;  // Obtén el texto de la cadena
+    cadena++;  // Avanza para ignorar el primer carácter de apertura '
+    cadena[strlen(cadena) - 1] = '\0';  // Elimina el último carácter de cierre '
+    printf("\nCadena de Caracteres: %s\n", cadena);
 	}
 %%
 
