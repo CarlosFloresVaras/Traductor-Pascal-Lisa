@@ -25,7 +25,7 @@ else repeat until while do for to downto with nil read readln write writeln in o
 
 /* Variables */
 unsigned int contadorfila = 0;
-
+unsigned int contadorcolumna = 0;
 
 unsigned int contadorBLANK = 0;
 unsigned int contadorNEWLINE = 0;
@@ -51,7 +51,7 @@ DIGITO 				[0-9]
 COMENTARIO 			\{[^}]*\}|\(\*[^*]*\*\)
 
 /* Identificadores */
-IDENTIFICADOR		{LETRA}({LETRA}|{DIGITO}|_)*
+IDENTIFICADOR		{LETRA}({LETRA}|{DIGITO}|_)+
 
 /* Tabuladores y Espacios en Blanco */
 BLANK				[ \t]
@@ -84,7 +84,7 @@ NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 {NEWLINE}	{
 		contadorfila++;
 		contadorNEWLINE += yyleng;
-		printf("\n%dambio de linea.\n", yytext);
+		printf("\n%d Cambio de linea.\n", contadorNEWLINE);
 		contadorNEWLINE = 0;
 	}	
 
@@ -94,7 +94,7 @@ NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 
 {BLANK}	{
 		contadorBLANK += yyleng;
-		printf("\n%dEspacio en blanco y/o tabuladores\n", contadorBLANK);
+		printf("\nEspacio en blanco y/o tabulador: %d\n", contadorBLANK);
 		contadorBLANK = 0;
 	}
 
