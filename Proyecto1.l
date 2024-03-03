@@ -19,9 +19,8 @@ else repeat until while do for to downto with nil read readln write writeln in o
 
 
 %{
-#include <stdlib.h>
 #include <stdio.h>
-#include <string.h> 
+#include <string.h>
 
 /* Variables */
 unsigned int contadorfila = 0;
@@ -30,7 +29,18 @@ unsigned int contadorcolumna = 0;
 unsigned int contadorBLANK = 0;
 unsigned int contadorNEWLINE = 0;
 
-/* Funciones */
+/* Contadores para archivos CSV */
+int consecutivoReservadas = 0;
+int consecutivoCadenas = 0;
+int consecutivoOperadores = 0;
+int consecutivoConstantes = 0;
+
+/* Archivos CSV */
+FILE *reservadasFile;
+FILE *cadenasFile;
+FILE *operadoresFile;
+FILE *constantesFile;
+
 
 %}
 
@@ -86,7 +96,7 @@ NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 		contadorNEWLINE += yyleng;
 		printf("\n%d Cambio de linea.\n", contadorNEWLINE);
 		contadorNEWLINE = 0;
-	}	
+}	
 
 {COMENTARIO}	{
     char* comentario = yytext;  // Obtén el texto del comentario
@@ -111,51 +121,63 @@ NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 	}
 
 {PALABRARESERVADA}	{
-		printf("\nPalabra Reservada: %s\n", yytext);
-	}
+    // Imprimir y almacenar en el archivo CSV para palabras reservadas
+	printf("\nPalabra Reservada: %s\n", yytext);
+	fprintf(reservadasFile, "%d,%s,1\n", ++consecutivoReservadas, yytext);
+}
 
 {SIMBOLO}	{
-		printf("\nSimbolo: %s\n", yytext);
-	}
+	printf("\nSimbolo: %s\n", yytext);
+	fprintf(operadoresFile, "%d,%s,1\n", ++consecutivoOperadores, yytext);
+}
 
 {UNARYOPERATOR}	{
-		printf("\nOperador Unario: %s\n", yytext);
-	}
+	printf("\nOperador Unario: %s\n", yytext);
+	fprintf(operadoresFile, "%d,%s,1\n", ++consecutivoOperadores, yytext);
+}
 
 {MULTOPERATOR}	{
-		printf("\nOperador Multiplicativo: %s\n", yytext);
-	}
+	printf("\nOperador Multiplicativo: %s\n", yytext);
+	fprintf(operadoresFile, "%d,%s,1\n", ++consecutivoOperadores, yytext);
+}
 
 {ADDOPERATOR}	{
-		printf("\nOperador Aditivo: %s\n", yytext);
-	}
+	printf("\nOperador Aditivo: %s\n", yytext);
+	fprintf(operadoresFile, "%d,%s,1\n", ++consecutivoOperadores, yytext);
+}
 
 {RELOPERATOR}	{
-		printf("\nOperador Relacional: %s\n", yytext);
-	}
+	printf("\nOperador Relacional: %s\n", yytext);
+	fprintf(operadoresFile, "%d,%s,1\n", ++consecutivoOperadores, yytext);
+}
 
 {IDENTIFICADOR}	{
-		printf("\nIdentificador: %s\n", yytext);
-	}
-
-{CONSTANTEREAL}	{
-		printf("\nConstante Real: %s\n", yytext);
-	}
+	printf("\nIdentificador: %s\n", yytext);
+}
 
 {CONSTANTEENTERA}	{
-		printf("\nConstante Entera: %s\n", yytext);
-	}
+	printf("\nConstante Entera: %s\n", yytext);
+	fprintf(constantesFile, "%d,%s,1\n", ++consecutivoConstantes, yytext);
+}
+
+{CONSTANTEREAL}	{
+	printf("\nConstante Real: %s\n", yytext);
+	fprintf(constantesFile, "%d,%s,1\n", ++consecutivoConstantes, yytext);
+}
 
 {NOTACIONEXPONENCIAL}	{
-		printf("\nNotacion Exponencial: %s\n", yytext);
-	}
+	printf("\nNotacion Exponencial: %s\n", yytext);
+	fprintf(constantesFile, "%d,%s,1\n", ++consecutivoConstantes, yytext);
+}
 
 {CADENA}	{
-	  char* cadena = yytext;  // Obtén el texto de la cadena
-    cadena++;  // Avanza para ignorar el primer carácter de apertura '
-    cadena[strlen(cadena) - 1] = '\0';  // Elimina el último carácter de cierre '
+    // Imprimir y almacenar en el archivo CSV para cadenas de caracteres
+	char* cadena = yytext + 1;  // Avanzar para omitir el primer carácter de apertura '
+    cadena[strlen(cadena) - 1] = '\0';  // Eliminar el último carácter de cierre '
     printf("\nCadena de Caracteres: %s\n", cadena);
-	}
+    fprintf(cadenasFile, "%d,%s,1\n", ++consecutivoCadenas, cadena);
+}
+
 %%
 
 int main(int argc, char* argv[])
@@ -174,8 +196,34 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
+	// Abrir archivos CSV para escritura
+	reservadasFile = fopen("reservadas.csv", "w");
+	cadenasFile = fopen("cadenas.csv", "w");
+	operadoresFile = fopen("operadores.csv", "w");
+	constantesFile = fopen("constantes.csv", "w");
+
+	if (reservadasFile == NULL || cadenasFile == NULL || operadoresFile == NULL || constantesFile == NULL)
+	{
+		printf("Error al abrir archivos CSV para escritura\n");
+		return 1;
+	}
+
+	// Imprimir encabezados en archivos CSV
+	fprintf(reservadasFile, "Consecutivo,Palabra Reservada,Repeticiones\n");
+	fprintf(cadenasFile, "Consecutivo,Cadena,Repeticiones\n");
+	fprintf(operadoresFile, "Consecutivo,Operador/Simbolo,Repeticiones\n");
+	fprintf(constantesFile, "Consecutivo,Constante,Repeticiones\n");
+
+	// Llamar a yylex para analizar el archivo
 	yylex();
 
+	// Cerrar archivos CSV
+	fclose(reservadasFile);
+	fclose(cadenasFile);
+	fclose(operadoresFile);
+	fclose(constantesFile);
+
+	// Cerrar archivo de entrada
 	fclose(yyin);
 
 	return 0;
