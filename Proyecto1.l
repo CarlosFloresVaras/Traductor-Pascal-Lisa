@@ -79,7 +79,7 @@ NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 
 {NEWLINE}	{
 		printf("\nCambio de linea. %s\n", yytext);
-	
+	}	
 
 {COMENTARIO}	{
 		printf("\nComentario: %s\n", yytext);
