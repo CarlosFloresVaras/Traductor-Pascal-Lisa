@@ -136,52 +136,62 @@ NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 
 {PALABRARESERVADA}	{
   // Imprimir y almacenar en el archivo CSV para palabras reservadas
-	printf("\nPalabra Reservada: %s\n", yytext);
+	printf("\n(%d,%d) Palabra Reservada: %s\n", contadorF, contadorC, yytext);
 	fprintf(reservadasFile, "%d,%s,1\n", ++consecutivoReservadas, yytext);
+	contadorC += yyleng;
 }
 
 {SIMBOLO}	{
-	printf("\nSimbolo: %s\n", yytext);
+	printf("\n(%d,%d) Simbolo: %s\n", contadorF, contadorC, yytext);
 	fprintf(operadoresFile, "%d,%s,1\n", ++consecutivoOperadores, yytext);
+	contadorC += yyleng;
 }
 
 {UNARYOPERATOR}	{
-	printf("\nOperador Unario: %s\n", yytext);
+	printf("\n(%d,%d) Operador Unario: %s\n", contadorF, contadorC, yytext);
 	fprintf(operadoresFile, "%d,%s,1\n", ++consecutivoOperadores, yytext);
+	contadorC += yyleng;
 }
 
 {MULTOPERATOR}	{
-	printf("\nOperador Multiplicativo: %s\n", yytext);
+	printf("\n(%d,%d) Operador Multiplicativo: %s\n", contadorF, contadorC, yytext);
 	fprintf(operadoresFile, "%d,%s,1\n", ++consecutivoOperadores, yytext);
+	contadorC += yyleng;
 }
 
 {ADDOPERATOR}	{
-	printf("\nOperador Aditivo: %s\n", yytext);
+	printf("\n(%d,%d) Operador Aditivo: %s\n", contadorF, contadorC, yytext);
 	fprintf(operadoresFile, "%d,%s,1\n", ++consecutivoOperadores, yytext);
+	contadorC += yyleng;
 }
 
 {RELOPERATOR}	{
-	printf("\nOperador Relacional: %s\n", yytext);
+	printf("\n(%d,%d) Operador Relacional: %s\n", contadorF, contadorC, yytext);
 	fprintf(operadoresFile, "%d,%s,1\n", ++consecutivoOperadores, yytext);
+	contadorC += yyleng;
 }
 
 {IDENTIFICADOR}	{
-	printf("\nIdentificador: %s\n", yytext);
+	printf("\n(%d,%d) Identificador: %s\n", contadorF, contadorC, yytext);
+	contadorC += yyleng;
 }
 
 {CONSTANTEENTERA}	{
-	printf("\nConstante Entera: %s\n", yytext);
+	printf("\n(%d,%d) Constante Entera: %s\n", contadorF, contadorC, yytext);
 	fprintf(constantesFile, "%d,%s,1\n", ++consecutivoConstantes, yytext);
+	contadorC += yyleng;
 }
 
 {CONSTANTEREAL}	{
-	printf("\nConstante Real: %s\n", yytext);
+	printf("\n(%d,%d) Constante Real: %s\n", contadorF, contadorC, yytext);
 	fprintf(constantesFile, "%d,%s,1\n", ++consecutivoConstantes, yytext);
+	contadorC += yyleng;
 }
 
 {NOTACIONEXPONENCIAL}	{
-	printf("\nNotacion Exponencial: %s\n", yytext);
+	printf("\n(%d,%d) Notacion Exponencial: %s\n", contadorF, contadorC, yytext);
 	fprintf(constantesFile, "%d,%s,1\n", ++consecutivoConstantes, yytext);
+	contadorC += yyleng;
 }
 
 {CADENA}    {
@@ -203,8 +213,8 @@ NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
         cadenasInfo[numCadenas].repeticiones = 1;
         numCadenas++;
     }
-
-    printf("\nCadena de Caracteres: %s\n", cadena);
+    printf("\n(%d,%d) Cadena de Caracteres: %s\n", contadorF, contadorC,cadena);
+	  contadorC += yyleng;
 }
 
 %%
@@ -251,7 +261,6 @@ int main(int argc, char* argv[])
     for (int i = 0; i < numCadenas; i++) {
         fprintf(cadenasFile, "%d,%s,%d\n", i + 1, cadenasInfo[i].cadena, cadenasInfo[i].repeticiones);
     }
-
     // Cerrar archivos CSV
     fclose(reservadasFile);
     fclose(cadenasFile);
