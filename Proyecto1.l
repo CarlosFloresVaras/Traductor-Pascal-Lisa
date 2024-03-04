@@ -81,7 +81,6 @@ NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 %%
 
 {NEWLINE}	{
-		contadorF++;
 		printf("\n(%d,%d) Cambio de linea.\n", contadorF, contadorC);
 		contadorC = 1;
 		contadorF++;
