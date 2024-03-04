@@ -102,7 +102,7 @@ CONSTANTEENTERA		[\+\-]?{DIGITOSINCERO}{DIGITO}*
 CONSTANTEREAL		[\+\-]?{DIGITOSINCERO}{DIGITO}*\.{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 
-%%
+%% 
 
 {NEWLINE}	{
 		printf("\n(%d,%d) Cambio de linea.\n", contadorF, contadorC);
