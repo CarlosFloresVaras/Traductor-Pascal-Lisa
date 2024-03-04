@@ -213,9 +213,8 @@ NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
         cadenasInfo[numCadenas].repeticiones = 1;
         numCadenas++;
     }
-
     printf("\n(%d,%d) Cadena de Caracteres: %s\n", contadorF, contadorC,cadena);
-	contadorC += yyleng;
+	  contadorC += yyleng;
 }
 
 %%
@@ -262,7 +261,6 @@ int main(int argc, char* argv[])
     for (int i = 0; i < numCadenas; i++) {
         fprintf(cadenasFile, "%d,%s,%d\n", i + 1, cadenasInfo[i].cadena, cadenasInfo[i].repeticiones);
     }
-
     // Cerrar archivos CSV
     fclose(reservadasFile);
     fclose(cadenasFile);
