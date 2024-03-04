@@ -20,27 +20,40 @@ else repeat until while do for to downto with nil read readln write writeln in o
 
 %{
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-/* Variables */
+// Variables
 unsigned int contadorfila = 0;
 unsigned int contadorcolumna = 0;
 
 unsigned int contadorBLANK = 0;
 unsigned int contadorNEWLINE = 0;
 
-/* Contadores para archivos CSV */
+// Contadores para archivos CSV
 int consecutivoReservadas = 0;
 int consecutivoCadenas = 0;
 int consecutivoOperadores = 0;
 int consecutivoConstantes = 0;
 
-/* Archivos CSV */
+// Archivos CSV
 FILE *reservadasFile;
 FILE *cadenasFile;
 FILE *operadoresFile;
 FILE *constantesFile;
 
+/*Estructuras*/
+// Estructura para almacenar información de cadenas
+typedef struct {
+    char cadena[256];
+    int repeticiones;
+} CadenaInfo;
+
+
+/*Arreglos*/
+// Arreglo para almacenar información de cadenas
+CadenaInfo cadenasInfo[1000];
+int numCadenas = 0;
 
 %}
 
@@ -170,14 +183,28 @@ NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 	fprintf(constantesFile, "%d,%s,1\n", ++consecutivoConstantes, yytext);
 }
 
-{CADENA}	{
-    // Imprimir y almacenar en el archivo CSV para cadenas de caracteres
-	char* cadena = yytext + 1;  // Avanzar para omitir el primer carácter de apertura '
-    cadena[strlen(cadena) - 1] = '\0';  // Eliminar el último carácter de cierre '
-    printf("\nCadena de Caracteres: %s\n", cadena);
-    fprintf(cadenasFile, "%d,%s,1\n", ++consecutivoCadenas, cadena);
-}
+{CADENA}    {
+    char* cadena = yytext + 1;
+    cadena[strlen(cadena) - 1] = '\0';
 
+    // Verificar si la cadena ya está en el arreglo
+    int i;
+    for (i = 0; i < numCadenas; i++) {
+        if (strcmp(cadenasInfo[i].cadena, cadena) == 0) {
+            cadenasInfo[i].repeticiones++;
+            break;
+        }
+    }
+
+    // Si la cadena no está en el arreglo, agregarla
+    if (i == numCadenas) {
+        strcpy(cadenasInfo[numCadenas].cadena, cadena);
+        cadenasInfo[numCadenas].repeticiones = 1;
+        numCadenas++;
+    }
+
+    printf("\nCadena de Caracteres: %s\n", cadena);
+}
 %%
 
 int main(int argc, char* argv[])
@@ -217,14 +244,20 @@ int main(int argc, char* argv[])
 	// Llamar a yylex para analizar el archivo
 	yylex();
 
-	// Cerrar archivos CSV
-	fclose(reservadasFile);
-	fclose(cadenasFile);
-	fclose(operadoresFile);
-	fclose(constantesFile);
+  // Imprimir y almacenar en el archivo CSV para cadenas
+    fprintf(cadenasFile, "Consecutivo,Cadena,Repeticiones\n");
+    for (int i = 0; i < numCadenas; i++) {
+        fprintf(cadenasFile, "%d,%s,%d\n", i + 1, cadenasInfo[i].cadena, cadenasInfo[i].repeticiones);
+    }
 
-	// Cerrar archivo de entrada
-	fclose(yyin);
+    // Cerrar archivos CSV
+    fclose(reservadasFile);
+    fclose(cadenasFile);
+    fclose(operadoresFile);
+    fclose(constantesFile);
 
-	return 0;
+    // Cerrar archivo de entrada
+    fclose(yyin);
+
+    return 0;
 }
