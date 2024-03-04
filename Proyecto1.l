@@ -23,7 +23,13 @@ else repeat until while do for to downto with nil read readln write writeln in o
 #include <stdio.h>
 #include <string.h> 
 
+/* Variables */
 // Variables
+unsigned int contadorC = 1;
+unsigned int contadorF = 1;
+
+unsigned int contadorBLANK = 0;
+
 unsigned int contadorfila = 0;
 unsigned int contadorcolumna = 0;
 
@@ -53,6 +59,7 @@ Reporte reporteCadenas[1000];
 Reporte reporteOperadores[1000];
 Reporte reporteConstantes[1000];
 
+/* Funciones */
 // Método para añadir a reporte
 void addToReport(Reporte* reporte, int& apariciones, char* yytext) {
     bool coincidencia = false;
@@ -101,13 +108,16 @@ DIGITO 				[0-9]
 COMENTARIO 			\{[^}]*\}|\(\*[^*]*\*\)
 
 /* Identificadores */
-IDENTIFICADOR		{LETRA}({LETRA}|{DIGITO}|_)*
+IDENTIFICADOR		{LETRA}({LETRA}|{DIGITO}|_)+
 
 /* Tabuladores y Espacios en Blanco */
 BLANK				[ \t]
 
+/* Nueva Linea */
+NEWLINE				\n
+
 /* Cadenas de Caracteres */
-CADENA				\"[^"]*\"
+CADENA				\'[^']*\'
 
 /* Operadores */
 UNARYOPERATOR		@|not
@@ -121,19 +131,41 @@ SIMBOLO				\(|\)|\[|\]|\,|\.|\:|\;|\^|\:=|\.\.
 /* Palabras Reservadas */
 PALABRARESERVADA	program|begin|uses|unit|interface|implementation|label|const|type|real|integer|longint|word|char|boolean|true|false|string|packed|array|record|end|case|otherwise|of|set|var|forward|external|function|procedure|file|goto|if|then|else|repeat|until|while|do|for|to|downto|with|nil|read|readln|write|writeln
 
-/* Constantes */
+/* Constantes */ 
 CONSTANTEENTERA		[\+\-]?{DIGITOSINCERO}{DIGITO}*
 CONSTANTEREAL		[\+\-]?{DIGITOSINCERO}{DIGITO}*\.{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 
 %%
 
+{NEWLINE}	{
+		printf("\n(%d,%d) Cambio de linea.\n", contadorF, contadorC);
+		contadorC = 1;
+		contadorF++;
+	}	
+
 {COMENTARIO}	{
-		printf("\nComentario: %s\n", yytext);
+    	char* comentario = yytext;  // Obtén el texto del comentario
+		if (comentario[0] == '(' )
+		{
+			comentario++;
+			comentario++;
+    		comentario[strlen(comentario) - 2] = '\0';  // Elimina el último carácter de cierre '}' o '*'
+		}
+    	else
+		{
+			comentario++;  // Avanza para ignorar el primer carácter de apertura '{' o '('
+    		comentario[strlen(comentario) - 1] = '\0';  // Elimina el último carácter de cierre '}' o '*'
+		}
+   		printf("\n(%d,%d) Comentario: %s\n", contadorF, contadorC, comentario);
+		contadorC += yyleng;
 	}
 
-{BLANK}	{
-		printf("\nEspacio en Blanco: %s\n", yytext);
+{BLANK}+	{
+		contadorBLANK += yyleng;
+		printf("\n(%d,%d) Espacio en blanco y/o tabulador: %d\n", contadorF, contadorC, contadorBLANK);
+		contadorBLANK = 0;
+		contadorC += yyleng;
 	}
 
 {PALABRARESERVADA}	{
@@ -165,13 +197,44 @@ NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 	printf("\nOperador Relacional: %s\n", yytext);
 	addToReport(reporteOperadores, aparicionesOperadores, yytext);
 }
+=======
+		printf("\n(%d,%d) Palabra Reservada: %s\n", contadorF, contadorC, yytext);
+		contadorC += yyleng;
+	}
+
+{SIMBOLO}	{
+		printf("\n(%d,%d) Simbolo: %s\n", contadorF, contadorC, yytext);
+		contadorC += yyleng;
+	}
+
+{UNARYOPERATOR}	{
+		printf("\n(%d,%d) Operador Unario: %s\n", contadorF, contadorC, yytext);
+		contadorC += yyleng;
+	}
+
+{MULTOPERATOR}	{
+		printf("\n(%d,%d) Operador Multiplicativo: %s\n", contadorF, contadorC, yytext);
+		contadorC += yyleng;
+	}
+
+{ADDOPERATOR}	{
+		printf("\n(%d,%d) Operador Aditivo: %s\n", contadorF, contadorC, yytext);
+		contadorC += yyleng;
+	}
+
+{RELOPERATOR}	{
+		printf("\n(%d,%d) Operador Relacional: %s\n", contadorF, contadorC, yytext);
+		contadorC += yyleng;
+	}
 
 {IDENTIFICADOR}	{
-		printf("\nIdentificador: %s\n", yytext);
+		printf("\n(%d,%d) Identificador: %s\n", contadorF, contadorC, yytext);
+		contadorC += yyleng;
 	}
 
 {CONSTANTEREAL}	{
-		printf("\nConstante Real: %s\n", yytext);
+		printf("\n(%d,%d) Constante Real: %s\n", contadorF, contadorC, yytext);
+		contadorC += yyleng;
 	}
 
 {CONSTANTEENTERA}	{
@@ -196,6 +259,23 @@ NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 
 	addToReport(reporteCadenas, aparicionesCadenas, cadena);
 }
+=======
+		printf("\n(%d,%d) Constante Entera: %s\n", contadorF, contadorC, yytext);
+		contadorC += yyleng;
+	}
+
+{NOTACIONEXPONENCIAL}	{
+		printf("\n(%d,%d) Notacion Exponencial: %s\n", contadorF, contadorC, yytext);
+		contadorC += yyleng;
+	}
+
+{CADENA}	{
+		char* cadena = yytext;  // Obtén el texto de la cadena
+    	cadena++;  // Avanza para ignorar el primer carácter de apertura '
+    	cadena[strlen(cadena) - 1] = '\0';  // Elimina el último carácter de cierre '
+    	printf("\n(%d,%d) Cadena de Caracteres: %s\n", contadorF, contadorC, cadena);
+		contadorC += yyleng;
+	}
 %%
 
 int main(int argc, char* argv[])
