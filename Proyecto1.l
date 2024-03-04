@@ -24,12 +24,10 @@ else repeat until while do for to downto with nil read readln write writeln in o
 #include <string.h> 
 
 /* Variables */
-unsigned int contadorfila = 0;
 unsigned int contadorC = 1;
 unsigned int contadorF = 1;
 
 unsigned int contadorBLANK = 0;
-unsigned int contadorNEWLINE = 0;
 
 /* Funciones */
 
@@ -83,93 +81,90 @@ NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 %%
 
 {NEWLINE}	{
-		contadorC++;
-		contadorNEWLINE++;
-		printf("\n(%d,%d) Cambio de linea.\n", contadorF, contadorC, contadorNEWLINE);
-		contadorNEWLINE = 0;
+		printf("\n(%d,%d) Cambio de linea.\n", contadorF, contadorC);
 		contadorC = 1;
 		contadorF++;
 	}	
 
 {COMENTARIO}	{
-	contadorC++;
     	char* comentario = yytext;  // Obtén el texto del comentario
-	if (comentario[0] == '(' )
-	{
-		comentario++;
-		comentario++;
+		if (comentario[0] == '(' )
+		{
+			comentario++;
+			comentario++;
     		comentario[strlen(comentario) - 2] = '\0';  // Elimina el último carácter de cierre '}' o '*'
-	}
+		}
     	else
-	{
-		comentario++;  // Avanza para ignorar el primer carácter de apertura '{' o '('
+		{
+			comentario++;  // Avanza para ignorar el primer carácter de apertura '{' o '('
     		comentario[strlen(comentario) - 1] = '\0';  // Elimina el último carácter de cierre '}' o '*'
+		}
+   		printf("\n(%d,%d) Comentario: %s\n", contadorF, contadorC, comentario);
+		contadorC += yyleng;
 	}
-    printf("\n(%d,%d) Comentario: %s\n", contadorF, contadorC, comentario);
-}
 
-{BLANK}	{
-		contadorC++;
+{BLANK}+	{
 		printf("\n(%d,%d) Espacio en blanco y/o tabulador: %d\n", contadorF, contadorC, contadorBLANK);
 		contadorBLANK = 0;
+		contadorC += yyleng;
 	}
 
 {PALABRARESERVADA}	{
-		contadorC++;
 		printf("\n(%d,%d) Palabra Reservada: %s\n", contadorF, contadorC, yytext);
+		contadorC += yyleng;
 	}
 
 {SIMBOLO}	{
-		contadorC++;
 		printf("\n(%d,%d) Simbolo: %s\n", contadorF, contadorC, yytext);
+		contadorC += yyleng;
 	}
 
 {UNARYOPERATOR}	{
-		contadorC++;
 		printf("\n(%d,%d) Operador Unario: %s\n", contadorF, contadorC, yytext);
+		contadorC += yyleng;
 	}
 
 {MULTOPERATOR}	{
-		contadorC++;
 		printf("\n(%d,%d) Operador Multiplicativo: %s\n", contadorF, contadorC, yytext);
+		contadorC += yyleng;
 	}
 
 {ADDOPERATOR}	{
-		contadorC++;
 		printf("\n(%d,%d) Operador Aditivo: %s\n", contadorF, contadorC, yytext);
+		contadorC += yyleng;
 	}
 
 {RELOPERATOR}	{
-		contadorC++;
 		printf("\n(%d,%d) Operador Relacional: %s\n", contadorF, contadorC, yytext);
+		contadorC += yyleng;
 	}
 
 {IDENTIFICADOR}	{
-		contadorC++;
 		printf("\n(%d,%d) Identificador: %s\n", contadorF, contadorC, yytext);
+		contadorC += yyleng;
 	}
 
 {CONSTANTEREAL}	{
-		contadorC++;
 		printf("\n(%d,%d) Constante Real: %s\n", contadorF, contadorC, yytext);
+		contadorC += yyleng;
 	}
 
 {CONSTANTEENTERA}	{
-		contadorC++;
 		printf("\n(%d,%d) Constante Entera: %s\n", contadorF, contadorC, yytext);
+		contadorC += yyleng;
 	}
 
 {NOTACIONEXPONENCIAL}	{
-		contadorC++;
 		printf("\n(%d,%d) Notacion Exponencial: %s\n", contadorF, contadorC, yytext);
+		contadorC += yyleng;
 	}
 
 {CADENA}	{
-		contadorC++;
 		char* cadena = yytext;  // Obtén el texto de la cadena
     	cadena++;  // Avanza para ignorar el primer carácter de apertura '
     	cadena[strlen(cadena) - 1] = '\0';  // Elimina el último carácter de cierre '
     	printf("\n(%d,%d) Cadena de Caracteres: %s\n", contadorF, contadorC, cadena);
+		contadorC += yyleng;
 	}
 %%
 
