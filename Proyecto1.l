@@ -23,7 +23,64 @@ else repeat until while do for to downto with nil read readln write writeln in o
 #include <stdio.h>
 #include <string.h> 
 
-/* Funciones */
+// Variables
+unsigned int contadorfila = 0;
+unsigned int contadorcolumna = 0;
+
+unsigned int contadorBLANK = 0;
+unsigned int contadorNEWLINE = 0;
+
+// Contadores para archivos CSV
+int aparicionesReservadas = 0;
+int aparicionesCadenas = 0;
+int aparicionesOperadores = 0;
+int aparicionesConstantes = 0;
+
+// Archivos CSV
+FILE *reservadasFile;
+FILE *cadenasFile;
+FILE *operadoresFile;
+FILE *constantesFile;
+
+// Reportes para CSV
+typedef struct {
+	char nombre[256];
+	int repeticiones;
+} Reporte;
+
+Reporte reporteReservadas[1000];
+Reporte reporteCadenas[1000];
+Reporte reporteOperadores[1000];
+Reporte reporteConstantes[1000];
+
+// Método para añadir a reporte
+void addToReport(Reporte* reporte, int& apariciones, char* yytext) {
+    bool coincidencia = false;
+
+    // Verificar si el término ya está en el arreglo para añadir una repetición
+    for (int i = 0; i < apariciones; i++) {
+        if (strcmp(reporte[i].nombre, yytext) == 0) {
+            reporte[i].repeticiones++;
+            coincidencia = true;
+            break;
+        }
+    }
+
+    // Si el término no está en el arreglo, agregarla
+    if (!coincidencia) {
+        strcpy(reporte[apariciones].nombre, yytext);
+        reporte[apariciones].repeticiones = 1;
+        apariciones++;
+    }
+}
+
+void writeReportToFile(FILE* file, const Reporte* reporte, int apariciones) {
+    fprintf(file, "Consecutivo,Palabra Reservada,Repeticiones\n");
+
+    for (int i = 0; i < apariciones; i++) {
+        fprintf(file, "%i,%s,%i\n", i + 1, reporte[i].nombre, reporte[i].repeticiones);
+    }
+}
 
 %}
 
@@ -80,28 +137,34 @@ NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 	}
 
 {PALABRARESERVADA}	{
-		printf("\nPalabra Reservada: %s\n", yytext);
-	}
+	printf("\nPalabra Reservada: %s\n", yytext);
+	addToReport(reporteReservadas, aparicionesReservadas, yytext);
+}
 
 {SIMBOLO}	{
-		printf("\nSimbolo: %s\n", yytext);
-	}
+	printf("\nSimbolo: %s\n", yytext);
+	addToReport(reporteOperadores, aparicionesOperadores, yytext);
+}
 
 {UNARYOPERATOR}	{
-		printf("\nOperador Unario: %s\n", yytext);
-	}
+	printf("\nOperador Unario: %s\n", yytext);
+	addToReport(reporteOperadores, aparicionesOperadores, yytext);
+}
 
 {MULTOPERATOR}	{
-		printf("\nOperador Multiplicativo: %s\n", yytext);
-	}
+	printf("\nOperador Multiplicativo: %s\n", yytext);
+	addToReport(reporteOperadores, aparicionesOperadores, yytext);
+}
 
 {ADDOPERATOR}	{
-		printf("\nOperador Aditivo: %s\n", yytext);
-	}
+	printf("\nOperador Aditivo: %s\n", yytext);
+	addToReport(reporteOperadores, aparicionesOperadores, yytext);
+}
 
 {RELOPERATOR}	{
-		printf("\nOperador Relacional: %s\n", yytext);
-	}
+	printf("\nOperador Relacional: %s\n", yytext);
+	addToReport(reporteOperadores, aparicionesOperadores, yytext);
+}
 
 {IDENTIFICADOR}	{
 		printf("\nIdentificador: %s\n", yytext);
@@ -112,16 +175,27 @@ NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 	}
 
 {CONSTANTEENTERA}	{
-		printf("\nConstante Entera: %s\n", yytext);
-	}
+	printf("\nConstante Entera: %s\n", yytext);
+	addToReport(reporteConstantes, aparicionesConstantes, yytext);
+}
+
+{CONSTANTEREAL}	{
+	printf("\nConstante Real: %s\n", yytext);
+	addToReport(reporteConstantes, aparicionesConstantes, yytext);
+}
 
 {NOTACIONEXPONENCIAL}	{
-		printf("\nNotacion Exponencial: %s\n", yytext);
-	}
+	printf("\nNotacion Exponencial: %s\n", yytext);
+	addToReport(reporteConstantes, aparicionesConstantes, yytext);
+}
 
-{CADENA}	{
-		printf("\nCadena de Caracteres: %s\n", yytext);
-	}
+{CADENA}    {
+    char* cadena = yytext + 1;
+    cadena[strlen(cadena) - 1] = '\0';
+	printf("\nCadena de Caracteres: %s\n", cadena);
+
+	addToReport(reporteCadenas, aparicionesCadenas, cadena);
+}
 %%
 
 int main(int argc, char* argv[])
@@ -140,9 +214,35 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
+	// Abrir archivos CSV para escritura
+	reservadasFile = fopen("reservadas.csv", "w");
+	cadenasFile = fopen("cadenas.csv", "w");
+	operadoresFile = fopen("operadores.csv", "w");
+	constantesFile = fopen("constantes.csv", "w");
+
+	if (reservadasFile == NULL || cadenasFile == NULL || operadoresFile == NULL || constantesFile == NULL)
+	{
+		printf("Error al abrir archivos CSV para escritura\n");
+		return 1;
+	}
+
+	// Llamar a yylex para analizar el archivo
 	yylex();
 
-	fclose(yyin);
+	// Imprimir archivos CSV
+	writeReportToFile(reservadasFile, reporteReservadas, aparicionesReservadas);
+	writeReportToFile(cadenasFile, reporteCadenas, aparicionesCadenas);
+	writeReportToFile(operadoresFile, reporteOperadores, aparicionesOperadores);
+	writeReportToFile(constantesFile, reporteConstantes, aparicionesConstantes);
+
+    // Cerrar archivos CSV
+    fclose(reservadasFile);
+    fclose(cadenasFile);
+    fclose(operadoresFile);
+    fclose(constantesFile);
+
+    // Cerrar archivo de entrada
+    fclose(yyin);
 
 	return 0;
 }
