@@ -23,12 +23,12 @@ else repeat until while do for to downto with nil read readln write writeln in o
 #include <stdlib.h>
 #include <string.h>
 
-// Variables
-unsigned int contadorfila = 0;
-unsigned int contadorcolumna = 0;
+
+/* Variables */
+unsigned int contadorC = 1;
+unsigned int contadorF = 1;
 
 unsigned int contadorBLANK = 0;
-unsigned int contadorNEWLINE = 0;
 
 // Contadores para archivos CSV
 int consecutivoReservadas = 0;
@@ -105,36 +105,37 @@ NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 %%
 
 {NEWLINE}	{
-		contadorfila++;
-		contadorNEWLINE += yyleng;
-		printf("\n%d Cambio de linea.\n", contadorNEWLINE);
-		contadorNEWLINE = 0;
-}	
+		printf("\n(%d,%d) Cambio de linea.\n", contadorF, contadorC);
+		contadorC = 1;
+		contadorF++;
+	}	
 
 {COMENTARIO}	{
-    char* comentario = yytext;  // Obtén el texto del comentario
-	if (comentario[0] == '(' )
-	{
-		comentario++;
-		comentario++;
-    	comentario[strlen(comentario) - 2] = '\0';  // Elimina el último carácter de cierre '}' o '*'
+    	char* comentario = yytext;  // Obtén el texto del comentario
+		if (comentario[0] == '(' )
+		{
+			comentario++;
+			comentario++;
+    		comentario[strlen(comentario) - 2] = '\0';  // Elimina el último carácter de cierre '}' o '*'
+		}
+    	else
+		{
+			comentario++;  // Avanza para ignorar el primer carácter de apertura '{' o '('
+    		comentario[strlen(comentario) - 1] = '\0';  // Elimina el último carácter de cierre '}' o '*'
+		}
+   		printf("\n(%d,%d) Comentario: %s\n", contadorF, contadorC, comentario);
+		contadorC += yyleng;
 	}
-    else
-	{
-		comentario++;  // Avanza para ignorar el primer carácter de apertura '{' o '('
-    	comentario[strlen(comentario) - 1] = '\0';  // Elimina el último carácter de cierre '}' o '*'
-	}
-    printf("\nComentario: %s\n", comentario);
-}
 
-{BLANK}	{
+{BLANK}+	{
 		contadorBLANK += yyleng;
-		printf("\nEspacio en blanco y/o tabulador: %d\n", contadorBLANK);
+		printf("\n(%d,%d) Espacio en blanco y/o tabulador: %d\n", contadorF, contadorC, contadorBLANK);
 		contadorBLANK = 0;
+		contadorC += yyleng;
 	}
 
 {PALABRARESERVADA}	{
-    // Imprimir y almacenar en el archivo CSV para palabras reservadas
+  // Imprimir y almacenar en el archivo CSV para palabras reservadas
 	printf("\nPalabra Reservada: %s\n", yytext);
 	fprintf(reservadasFile, "%d,%s,1\n", ++consecutivoReservadas, yytext);
 }
@@ -205,6 +206,7 @@ NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 
     printf("\nCadena de Caracteres: %s\n", cadena);
 }
+
 %%
 
 int main(int argc, char* argv[])
