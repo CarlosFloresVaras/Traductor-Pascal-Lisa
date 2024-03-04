@@ -104,6 +104,7 @@ NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 	}
 
 {BLANK}+	{
+		contadorBLANK += yyleng;
 		printf("\n(%d,%d) Espacio en blanco y/o tabulador: %d\n", contadorF, contadorC, contadorBLANK);
 		contadorBLANK = 0;
 		contadorC += yyleng;
