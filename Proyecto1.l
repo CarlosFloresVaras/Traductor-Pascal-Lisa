@@ -19,9 +19,10 @@ else repeat until while do for to downto with nil read readln write writeln in o
 
 
 %{
-#include <stdlib.h>
 #include <stdio.h>
-#include <string.h> 
+#include <stdlib.h>
+#include <string.h>
+
 
 /* Variables */
 unsigned int contadorC = 1;
@@ -29,7 +30,30 @@ unsigned int contadorF = 1;
 
 unsigned int contadorBLANK = 0;
 
-/* Funciones */
+// Contadores para archivos CSV
+int consecutivoReservadas = 0;
+int consecutivoCadenas = 0;
+int consecutivoOperadores = 0;
+int consecutivoConstantes = 0;
+
+// Archivos CSV
+FILE *reservadasFile;
+FILE *cadenasFile;
+FILE *operadoresFile;
+FILE *constantesFile;
+
+/*Estructuras*/
+// Estructura para almacenar información de cadenas
+typedef struct {
+    char cadena[256];
+    int repeticiones;
+} CadenaInfo;
+
+
+/*Arreglos*/
+// Arreglo para almacenar información de cadenas
+CadenaInfo cadenasInfo[1000];
+int numCadenas = 0;
 
 %}
 
@@ -111,62 +135,78 @@ NOTACIONEXPONENCIAL	[\+\-]?{DIGITOSINCERO}{DIGITO}+([eE][\+\-]?{DIGITO}+)?
 	}
 
 {PALABRARESERVADA}	{
-		printf("\n(%d,%d) Palabra Reservada: %s\n", contadorF, contadorC, yytext);
-		contadorC += yyleng;
-	}
+  // Imprimir y almacenar en el archivo CSV para palabras reservadas
+	printf("\nPalabra Reservada: %s\n", yytext);
+	fprintf(reservadasFile, "%d,%s,1\n", ++consecutivoReservadas, yytext);
+}
 
 {SIMBOLO}	{
-		printf("\n(%d,%d) Simbolo: %s\n", contadorF, contadorC, yytext);
-		contadorC += yyleng;
-	}
+	printf("\nSimbolo: %s\n", yytext);
+	fprintf(operadoresFile, "%d,%s,1\n", ++consecutivoOperadores, yytext);
+}
 
 {UNARYOPERATOR}	{
-		printf("\n(%d,%d) Operador Unario: %s\n", contadorF, contadorC, yytext);
-		contadorC += yyleng;
-	}
+	printf("\nOperador Unario: %s\n", yytext);
+	fprintf(operadoresFile, "%d,%s,1\n", ++consecutivoOperadores, yytext);
+}
 
 {MULTOPERATOR}	{
-		printf("\n(%d,%d) Operador Multiplicativo: %s\n", contadorF, contadorC, yytext);
-		contadorC += yyleng;
-	}
+	printf("\nOperador Multiplicativo: %s\n", yytext);
+	fprintf(operadoresFile, "%d,%s,1\n", ++consecutivoOperadores, yytext);
+}
 
 {ADDOPERATOR}	{
-		printf("\n(%d,%d) Operador Aditivo: %s\n", contadorF, contadorC, yytext);
-		contadorC += yyleng;
-	}
+	printf("\nOperador Aditivo: %s\n", yytext);
+	fprintf(operadoresFile, "%d,%s,1\n", ++consecutivoOperadores, yytext);
+}
 
 {RELOPERATOR}	{
-		printf("\n(%d,%d) Operador Relacional: %s\n", contadorF, contadorC, yytext);
-		contadorC += yyleng;
-	}
+	printf("\nOperador Relacional: %s\n", yytext);
+	fprintf(operadoresFile, "%d,%s,1\n", ++consecutivoOperadores, yytext);
+}
 
 {IDENTIFICADOR}	{
-		printf("\n(%d,%d) Identificador: %s\n", contadorF, contadorC, yytext);
-		contadorC += yyleng;
-	}
-
-{CONSTANTEREAL}	{
-		printf("\n(%d,%d) Constante Real: %s\n", contadorF, contadorC, yytext);
-		contadorC += yyleng;
-	}
+	printf("\nIdentificador: %s\n", yytext);
+}
 
 {CONSTANTEENTERA}	{
-		printf("\n(%d,%d) Constante Entera: %s\n", contadorF, contadorC, yytext);
-		contadorC += yyleng;
-	}
+	printf("\nConstante Entera: %s\n", yytext);
+	fprintf(constantesFile, "%d,%s,1\n", ++consecutivoConstantes, yytext);
+}
+
+{CONSTANTEREAL}	{
+	printf("\nConstante Real: %s\n", yytext);
+	fprintf(constantesFile, "%d,%s,1\n", ++consecutivoConstantes, yytext);
+}
 
 {NOTACIONEXPONENCIAL}	{
-		printf("\n(%d,%d) Notacion Exponencial: %s\n", contadorF, contadorC, yytext);
-		contadorC += yyleng;
-	}
+	printf("\nNotacion Exponencial: %s\n", yytext);
+	fprintf(constantesFile, "%d,%s,1\n", ++consecutivoConstantes, yytext);
+}
 
-{CADENA}	{
-		char* cadena = yytext;  // Obtén el texto de la cadena
-    	cadena++;  // Avanza para ignorar el primer carácter de apertura '
-    	cadena[strlen(cadena) - 1] = '\0';  // Elimina el último carácter de cierre '
-    	printf("\n(%d,%d) Cadena de Caracteres: %s\n", contadorF, contadorC, cadena);
-		contadorC += yyleng;
-	}
+{CADENA}    {
+    char* cadena = yytext + 1;
+    cadena[strlen(cadena) - 1] = '\0';
+
+    // Verificar si la cadena ya está en el arreglo
+    int i;
+    for (i = 0; i < numCadenas; i++) {
+        if (strcmp(cadenasInfo[i].cadena, cadena) == 0) {
+            cadenasInfo[i].repeticiones++;
+            break;
+        }
+    }
+
+    // Si la cadena no está en el arreglo, agregarla
+    if (i == numCadenas) {
+        strcpy(cadenasInfo[numCadenas].cadena, cadena);
+        cadenasInfo[numCadenas].repeticiones = 1;
+        numCadenas++;
+    }
+
+    printf("\nCadena de Caracteres: %s\n", cadena);
+}
+
 %%
 
 int main(int argc, char* argv[])
@@ -185,9 +225,41 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
+	// Abrir archivos CSV para escritura
+	reservadasFile = fopen("reservadas.csv", "w");
+	cadenasFile = fopen("cadenas.csv", "w");
+	operadoresFile = fopen("operadores.csv", "w");
+	constantesFile = fopen("constantes.csv", "w");
+
+	if (reservadasFile == NULL || cadenasFile == NULL || operadoresFile == NULL || constantesFile == NULL)
+	{
+		printf("Error al abrir archivos CSV para escritura\n");
+		return 1;
+	}
+
+	// Imprimir encabezados en archivos CSV
+	fprintf(reservadasFile, "Consecutivo,Palabra Reservada,Repeticiones\n");
+	fprintf(cadenasFile, "Consecutivo,Cadena,Repeticiones\n");
+	fprintf(operadoresFile, "Consecutivo,Operador/Simbolo,Repeticiones\n");
+	fprintf(constantesFile, "Consecutivo,Constante,Repeticiones\n");
+
+	// Llamar a yylex para analizar el archivo
 	yylex();
 
-	fclose(yyin);
+  // Imprimir y almacenar en el archivo CSV para cadenas
+    fprintf(cadenasFile, "Consecutivo,Cadena,Repeticiones\n");
+    for (int i = 0; i < numCadenas; i++) {
+        fprintf(cadenasFile, "%d,%s,%d\n", i + 1, cadenasInfo[i].cadena, cadenasInfo[i].repeticiones);
+    }
 
-	return 0;
+    // Cerrar archivos CSV
+    fclose(reservadasFile);
+    fclose(cadenasFile);
+    fclose(operadoresFile);
+    fclose(constantesFile);
+
+    // Cerrar archivo de entrada
+    fclose(yyin);
+
+    return 0;
 }
